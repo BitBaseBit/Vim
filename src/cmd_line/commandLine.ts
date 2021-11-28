@@ -249,6 +249,8 @@ export class ExCommandLine extends CommandLine {
   }
 
   public async run(vimState: VimState): Promise<void> {
+    const workbenchConfig = vscode.workspace.getConfiguration('workbench');
+    workbenchConfig.update('statusBar.visible', false, true);
     ExCommandLine.history.add(this.text);
     this.historyIndex = ExCommandLine.history.get().length;
 
@@ -402,6 +404,8 @@ export class SearchCommandLine extends CommandLine {
   }
 
   public async run(vimState: VimState): Promise<void> {
+    const workbenchConfig = vscode.workspace.getConfiguration('workbench');
+    workbenchConfig.update('statusBar.visible', false, true);
     await vimState.setCurrentMode(this.previousMode);
 
     // Repeat the previous search if no new string is entered
