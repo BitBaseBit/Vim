@@ -1,3 +1,4 @@
+import * as vscode from 'vscode';
 import { CommandLineHistory, HistoryFile, SearchHistory } from '../history/historyFile';
 import { Mode } from './../mode/mode';
 import { Logger } from '../util/logger';
@@ -27,6 +28,8 @@ export abstract class CommandLine {
   private savedText: string;
 
   constructor(text: string, previousMode: Mode) {
+    const workbenchConfig = vscode.workspace.getConfiguration('workbench');
+    workbenchConfig.update('statusBar.visible', true, true);
     this.cursorIndex = text.length;
     this.historyIndex = this.getHistory().get().length;
     this.previousMode = previousMode;
@@ -107,6 +110,8 @@ export abstract class CommandLine {
    */
   public async backspace(vimState: VimState): Promise<void> {
     if (this.cursorIndex === 0) {
+      const workbenchConfig = vscode.workspace.getConfiguration('workbench');
+      workbenchConfig.update('statusBar.visible', false, true);
       return this.escape(vimState);
     }
 
@@ -119,6 +124,8 @@ export abstract class CommandLine {
    */
   public async delete(vimState: VimState): Promise<void> {
     if (this.cursorIndex === 0) {
+      const workbenchConfig = vscode.workspace.getConfiguration('workbench');
+      workbenchConfig.update('statusBar.visible', false, true);
       return this.escape(vimState);
     } else if (this.cursorIndex === this.text.length) {
       return this.backspace(vimState);
@@ -293,6 +300,8 @@ export class ExCommandLine extends CommandLine {
 
   public async escape(vimState: VimState): Promise<void> {
     await vimState.setCurrentMode(Mode.Normal);
+    const workbenchConfig = vscode.workspace.getConfiguration('workbench');
+    workbenchConfig.update('workbench.statusBar.visible', false, true);
     if (this.text.length > 0) {
       ExCommandLine.history.add(this.text);
     }
@@ -445,6 +454,8 @@ export class SearchCommandLine extends CommandLine {
   }
 
   public async escape(vimState: VimState): Promise<void> {
+    const workbenchConfig = vscode.workspace.getConfiguration('workbench');
+    workbenchConfig.update('statusBar.visible', false, true);
     vimState.cursorStopPosition = this.searchState.cursorStartPosition;
 
     const prevSearchList = SearchCommandLine.previousSearchStates;
